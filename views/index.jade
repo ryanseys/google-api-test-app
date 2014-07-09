@@ -5,7 +5,7 @@ block content
   p Welcome to #{title}
   form(name="input", action="/login" method="post")
     input(type="submit" value="Login to Google")
-  form(name='uploadtest', action="/uploadtest", method="get")
+  form(name='uploadtest', action="/uploadtest", method="post")
     input(type="submit", value="UploadTest")
-  form(name='uploadimage', action="/uploadimage", method="get")
+  form(name='uploadimage', action="/uploadimage", method="post")
     input(type="submit", value="Upload image")

@@ -60,25 +60,32 @@ router.get('/uploadtest', function(req, res) {
   }
 });
 
-router.get('/uploadimage', function(req, res) {
+router.post('/uploadimage', function(req, res) {
   if(req.session.tokens) {
     var drive = google.drive('v2');
     drive = drive.auth(oauth2Client);
 
+    var filename = 'ios.ipsw';
+
     var payload = {
       media: {
         metadata: {
-          mimeType: 'image/png',
-          title: 'uploadimagetest.png'
+          title: filename
         },
-        data: fs.createReadStream(__dirname + '/../awesome.png')
+        data: fs.createReadStream(__dirname + '/../' + filename)
       }
     };
 
-    drive.files.insert(payload, function(err, body) {
-      if(!err) res.end(JSON.stringify(body));
-      else res.end(JSON.stringify(err));
+    var r = drive.files.insert(payload, function(err, body) {
+      // if(!err) res.end(JSON.stringify(body));
+      // else res.end(JSON.stringify(err));
     });
+
+    setInterval(function() {
+      console.log((r.req.connection.socket._bytesDispatched / (1024*1024)) + ' MB uploaded');
+    }, 1000);
+
+    res.redirect('/');
   }
   else {
     res.redirect('/');
