@@ -37,75 +37,42 @@ router.post('/login', function(req, res) {
   res.redirect(generatedUrl);
 });
 
-router.get('/uploadtest', function(req, res) {
+router.post('/uploadtest', function(req, res) {
   if(req.session.tokens) {
-    var drive = google.drive('v2');
-    drive = drive.auth({ authClient: oauth2Client });
+    var drive = google.drive({ version: 'v2', auth: oauth2Client });
     var payload = {
-      media: {
-        metadata: {
-          mimeType: 'text/plain',
-          title: 'wat.txt'
-        },
-        data: 'This file uploaded on ' + (new Date()).toString()
-      }
+      resource: {
+        mimeType: 'text/plain',
+        title: 'wat.txt'
+      },
+      media: 'This file uploaded on ' + (new Date()).toString()
     };
     drive.files.insert(payload, function(err, body) {
-      if(!err) res.end(JSON.stringify(body));
-      else res.end(JSON.stringify(err));
+      console.log(err, body);
+      // if(!err) res.end(JSON.stringify(body));
+      // else res.end(JSON.stringify(err));
     });
   }
-  else {
-    res.redirect('/');
-  }
+  res.redirect('/');
 });
 
 router.post('/uploadimage', function(req, res) {
   if(req.session.tokens) {
-    var drive = google.drive('v2');
-    drive = drive.auth(oauth2Client);
-
-    var filename = 'ios.ipsw';
+    var drive = google.drive({ version: 'v2', auth: oauth2Client });
+    var filename = 'awesome.png';
 
     var payload = {
-      media: {
-        metadata: {
+      resource: {
           title: filename
-        },
-        data: fs.createReadStream(__dirname + '/../' + filename)
-      }
+      },
+      media: fs.createReadStream(__dirname + '/../' + filename)
     };
 
     var r = drive.files.insert(payload, function(err, body) {
-      // if(!err) res.end(JSON.stringify(body));
-      // else res.end(JSON.stringify(err));
+      console.log(err, body);
     });
-
-    setInterval(function() {
-      console.log((r.req.connection.socket._bytesDispatched / (1024*1024)) + ' MB uploaded');
-    }, 1000);
-
-    res.redirect('/');
   }
-  else {
-    res.redirect('/');
-  }
-});
-
-router.get('/uploadimagepipe', function(req, res) {
-  if(req.session.tokens) {
-    var drive = google.drive('v2');
-    drive = drive.auth(oauth2Client);
-
-    fs.createReadStream(__dirname + '/../awesome.png').pipe(drive.files.insert(function(err, body) {
-      if(!err) res.end(JSON.stringify(body));
-      else res.end(JSON.stringify(err));
-    }));
-
-  }
-  else {
-    res.redirect('/');
-  }
+  res.redirect('/');
 });
 
 router.get('/oauth2callback', function(req, res) {
