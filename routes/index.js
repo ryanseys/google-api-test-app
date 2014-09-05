@@ -1,11 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var secrets = require(__dirname + '/../secrets.json');
-var google = require(__dirname + '/../../google-api-nodejs-client');
+var google = require('googleapis');
+
 var fs = require('fs');
 
 var drive = google.drive('v2');
 var options = { fileId: '123' };
+
 drive.files.get(options);
 drive.files.get(options);
 
@@ -97,6 +99,10 @@ router.get('/oauth2callback', function(req, res) {
   if(code) {
     req.session.code = code;
     oauth2Client.getToken(code, function(err, tokens) {
+      if(err) {
+        console.log(err);
+      }
+
       req.session.tokens = tokens;
       oauth2Client.setCredentials(tokens);
       res.redirect('/');
